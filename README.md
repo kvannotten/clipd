@@ -16,6 +16,7 @@ Run the clipd executable (currently it doesn't daemonize itself yet). Then you c
 
  * Make path configurable
  * Acts as daemon
+ * Make display configurable
 
 # Credits
 
