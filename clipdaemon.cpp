@@ -140,14 +140,14 @@ ClipboardEventSubscriber::ClipboardEventSubscriber(const std::string &displ) : d
   }
 }
 
-void writeEntry(std::string data) {
+void writeEntry(std::string &data, std::string &path) {
   std::fstream myFile;
-  myFile.open("/tmp/clipd.data", std::ios::out | std::ios::app);
+  myFile.open(path.c_str(), std::ios::out | std::ios::app);
   myFile << data.c_str() << std::endl;
   myFile.close();
 }
 
-void eventLoop(std::string &display) {
+void eventLoop(std::string &display, std::string &path) {
   ClipboardEventSubscriber ces(display);
 
   std::string lastData;
@@ -156,24 +156,39 @@ void eventLoop(std::string &display) {
 
     data = ces.getData("CLIPBOARD");
 
-    if (data == lastData) {
+    if (data == lastData || data.empty()) {
       sleep(1);
       continue;
     }
 
-    owner = ces.getOwner("CLIPBOARD");
+    //owner = ces.getOwner("CLIPBOARD");
 
     if (data != lastData) {
-      writeEntry(data);
+      writeEntry(data, path);
     }
 
     lastData = data;
   }
 }
 
-int main() {
+int main(int argc, char** argv) {
     // still needs to be fetched from a config or so
     std::string display = ":0";
+    std::string path = "/tmp/clipd.data";
+    int c;
+
+    while ((c = getopt(argc, argv, "d:p:")) != -1) {
+      switch(c) {
+        case 'd':
+          display = optarg;
+          break;
+        case 'p':
+          path = optarg;
+          break;
+        default:
+          exit(EXIT_FAILURE);
+      }
+    }
 
     pid_t pid, sid;
 
@@ -198,7 +213,7 @@ int main() {
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
 
-    eventLoop(display);
+    eventLoop(display, path);
 
     exit(EXIT_SUCCESS);
 }
