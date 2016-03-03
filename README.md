@@ -14,9 +14,7 @@ Run the clipd executable (currently it doesn't daemonize itself yet). Then you c
 
 # TODO
 
- * Make path configurable
- * Acts as daemon
- * Make display configurable
+https://github.com/kvannotten/clipd/issues/1
 
 # Credits
 
