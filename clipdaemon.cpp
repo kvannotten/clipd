@@ -16,6 +16,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
 #include <string>
 #include <stdio.h>
@@ -46,7 +50,7 @@ Atom ClipboardEventSubscriber::getAtom(const std::string &which) {
   Atom a;
   if((a = XInternAtom(display, which.c_str(), True)) == None) {
     printf("Can't find atom %s", which);
-    exit(4);
+    exit(EXIT_FAILURE);
   }
 
   return a;
@@ -60,7 +64,7 @@ std::string ClipboardEventSubscriber::getOwner(const std::string &which) {
 
   if ( None == (win = XGetSelectionOwner(display, atom)) ) {
     printf("Can't get selection owner");
-    exit(5);
+    exit(EXIT_FAILURE);
   }
 
   XFetchName(display, win, &windowName);
@@ -118,7 +122,7 @@ ClipboardEventSubscriber::ClipboardEventSubscriber(const std::string &displ) : d
 
   if (!(display = XOpenDisplay(display_cstr))) {
     printf("Error while opening display");
-    exit(2);
+    exit(EXIT_FAILURE);
   }
 
   int screen_num = DefaultScreen(display);
@@ -132,7 +136,7 @@ ClipboardEventSubscriber::ClipboardEventSubscriber(const std::string &displ) : d
 
   if (!myWindow) {
     printf("Failed to create window");
-    exit(3);
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -144,7 +148,7 @@ void writeEntry(std::string data) {
 }
 
 void eventLoop(std::string &display) {
-  ClipboardEventSubscriber ces(":0");
+  ClipboardEventSubscriber ces(display);
 
   std::string lastData;
   for(;;) {
@@ -168,7 +172,33 @@ void eventLoop(std::string &display) {
 }
 
 int main() {
-    std::string display;
+    // still needs to be fetched from a config or so
+    std::string display = ":0";
+
+    pid_t pid, sid;
+
+    pid = fork();
+    if (pid < 0) {
+      exit(EXIT_FAILURE);
+    }
+
+    // exit parent process if forked successfully
+    if (pid > 0) {
+      exit(EXIT_SUCCESS);
+    }
+
+    umask(0);
+
+    sid = setsid();
+    if (sid < 0) {
+      exit(EXIT_FAILURE);
+    }
+
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
 
     eventLoop(display);
+
+    exit(EXIT_SUCCESS);
 }

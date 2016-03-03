@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall
+CFLAGS=-Wall -g
 SOURCES=clipdaemon.cpp
 EXECUTABLE=clipd
 
