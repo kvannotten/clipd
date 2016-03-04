@@ -39,7 +39,6 @@ class ClipboardEventSubscriber {
 public:
   ClipboardEventSubscriber(const std::string &display);
   std::string getData(const std::string &atom);
-  std::string getOwner(const std::string &atom);
 
 private:
   Atom getAtom(const std::string &atom);
@@ -54,23 +53,6 @@ Atom ClipboardEventSubscriber::getAtom(const std::string &which) {
   }
 
   return a;
-}
-
-std::string ClipboardEventSubscriber::getOwner(const std::string &which) {
-  Atom atom = getAtom(which);
-  std::string atomName = XGetAtomName(display, atom);
-  Window win;
-  char *windowName;
-
-  if ( None == (win = XGetSelectionOwner(display, atom)) ) {
-    printf("Can't get selection owner");
-    exit(EXIT_FAILURE);
-  }
-
-  XFetchName(display, win, &windowName);
-  std::string ret(windowName);
-  XFree(windowName);
-  return ret;
 }
 
 std::string ClipboardEventSubscriber::getData(const std::string &atom) {
@@ -161,8 +143,6 @@ void eventLoop(std::string &display, std::string &path) {
       continue;
     }
 
-    //owner = ces.getOwner("CLIPBOARD");
-
     if (data != lastData) {
       writeEntry(data, path);
     }
@@ -172,48 +152,50 @@ void eventLoop(std::string &display, std::string &path) {
 }
 
 int main(int argc, char** argv) {
-    // still needs to be fetched from a config or so
-    std::string display = ":0";
-    std::string path = "/tmp/clipd.data";
-    int c;
+  // set defaults
+  std::string display = ":0";
+  std::string path = "/tmp/clipd.data";
+  int c;
 
-    while ((c = getopt(argc, argv, "d:p:")) != -1) {
-      switch(c) {
-        case 'd':
-          display = optarg;
-          break;
-        case 'p':
-          path = optarg;
-          break;
-        default:
-          exit(EXIT_FAILURE);
-      }
+  while ((c = getopt(argc, argv, "d:p:")) != -1) {
+    switch(c) {
+      case 'd':
+        display = optarg;
+        break;
+      case 'p':
+        path = optarg;
+        break;
+      default:
+        exit(EXIT_FAILURE);
     }
+  }
 
-    pid_t pid, sid;
+  // daemonize/fork the app
+  pid_t pid, sid;
 
-    pid = fork();
-    if (pid < 0) {
-      exit(EXIT_FAILURE);
-    }
+  pid = fork();
+  if (pid < 0) {
+    exit(EXIT_FAILURE);
+  }
 
-    // exit parent process if forked successfully
-    if (pid > 0) {
-      exit(EXIT_SUCCESS);
-    }
-
-    umask(0);
-
-    sid = setsid();
-    if (sid < 0) {
-      exit(EXIT_FAILURE);
-    }
-
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-
-    eventLoop(display, path);
-
+  // exit parent process if forked successfully
+  if (pid > 0) {
     exit(EXIT_SUCCESS);
+  }
+
+  umask(0);
+
+  sid = setsid();
+  if (sid < 0) {
+    exit(EXIT_FAILURE);
+  }
+
+  close(STDIN_FILENO);
+  close(STDOUT_FILENO);
+  close(STDERR_FILENO);
+
+  // main loop
+  eventLoop(display, path);
+
+  exit(EXIT_SUCCESS);
 }
