@@ -45,17 +45,21 @@ private:
 };
 
 
-Atom ClipboardEventSubscriber::getAtom(const std::string &which) {
+Atom
+ClipboardEventSubscriber::getAtom(const std::string &which)
+{
   Atom a;
   if((a = XInternAtom(display, which.c_str(), True)) == None) {
-    printf("Can't find atom %s", which);
+    printf("Can't find atom %s", which.c_str());
     exit(EXIT_FAILURE);
   }
 
   return a;
 }
 
-std::string ClipboardEventSubscriber::getData(const std::string &atom) {
+std::string
+ClipboardEventSubscriber::getData(const std::string &atom)
+{
   XConvertSelection(display,
                     getAtom(atom),
                     XA_STRING,
@@ -122,14 +126,18 @@ ClipboardEventSubscriber::ClipboardEventSubscriber(const std::string &displ) : d
   }
 }
 
-void writeEntry(std::string &data, std::string &path) {
+void
+writeEntry(std::string &data, std::string &path)
+{
   std::fstream myFile;
   myFile.open(path.c_str(), std::ios::out | std::ios::app);
   myFile << data.c_str() << std::endl;
   myFile.close();
 }
 
-void eventLoop(std::string &display, std::string &path) {
+void
+eventLoop(std::string &display, std::string &path)
+{
   ClipboardEventSubscriber ces(display);
 
   std::string lastData;
@@ -151,10 +159,12 @@ void eventLoop(std::string &display, std::string &path) {
   }
 }
 
-int main(int argc, char** argv) {
+int
+main(int argc, char** argv)
+{
   // set defaults
   std::string display = ":0";
-  std::string path = "/tmp/clipd.data";
+  std::string path    = "/tmp/clipd.data";
   int c;
 
   while ((c = getopt(argc, argv, "d:p:")) != -1) {
@@ -163,7 +173,7 @@ int main(int argc, char** argv) {
         display = optarg;
         break;
       case 'p':
-        path = optarg;
+        path    = optarg;
         break;
       default:
         exit(EXIT_FAILURE);
