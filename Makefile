@@ -1,6 +1,6 @@
-CC=g++
+CC=gcc
 CFLAGS=-Wall -g
-SOURCES=clipdaemon.cpp
+SOURCES=clipd.c
 EXECUTABLE=clipd
 
 all:
