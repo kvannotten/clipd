@@ -10,6 +10,7 @@ Display *dis;
 Window win;
 int x11_fd;
 fd_set in_fds;
+ClipConfig config;
 
 struct timeval tv;
 XEvent ev;
@@ -68,14 +69,15 @@ void mainLoop()
         strcpy(lastData, data);
         // store trimmed version
         trim(data);
-        storeData(data, "");
+        storeData(data, config.path);
       }
     }
   }
 }
 
-int main()
+int main(int argc, char **argv)
 {
+  config = parseArgs(argc, argv);
   setup();
   mainLoop();
   return(0);
