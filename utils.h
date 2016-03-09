@@ -48,7 +48,7 @@ void storeData(char *data, char *path)
 ClipConfig parseArgs(int argc, char **argv)
 {
   ClipConfig config = {};
-  
+
   int c;
 
   while ((c = getopt(argc, argv, "p:")) != -1) {
