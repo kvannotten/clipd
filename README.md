@@ -12,9 +12,7 @@ Run `make`. This will give you the clipd executable that you can run.
 
 Run the clipd executable. You can set the storage path and the display to use; ie:
 
-`clipd -d :0 -p /tmp/clipd.data`
-
-If you do not set the display the default will be `:0`. If you do not set the path, the default will be: `/tmp/clipd.data`.
+`clipd -p /tmp/clipd.data`
 
 Afterwards you can query the file with any application you want. For example you could do something like: 
 
