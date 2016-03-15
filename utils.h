@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <getopt.h>
+#include <sys/select.h>
 
 typedef struct {
   char* path;
@@ -28,13 +30,17 @@ void ltrim(char *str)
   memmove(str, str + n, strlen(str) - n + 1);
 }
 
-void trim(char *str)
+char* trim(unsigned char *str, int len)
 {
-  rtrim(str);
-  ltrim(str);
+  char *tmp = (char*)malloc(sizeof(char) * len);
+  memcpy(tmp, str, sizeof(char) * len);
+  rtrim(tmp);
+  ltrim(tmp);
+
+  return tmp;
 }
 
-void storeData(char *data, char *path)
+void storeData(const char *data, char *path)
 {
   FILE *file = fopen(path, "a");
   if (file == NULL) {
@@ -47,7 +53,7 @@ void storeData(char *data, char *path)
 
 ClipConfig parseArgs(int argc, char **argv)
 {
-  ClipConfig config = {};
+  ClipConfig config;
 
   int c;
 

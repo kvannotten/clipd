@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -std=c99 -pedantic
 SOURCES=clipd.c
 EXECUTABLE=clipd
 

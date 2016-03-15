@@ -64,12 +64,14 @@ void mainLoop()
           AnyPropertyType, &type, &format, &nitems,
           &bytes_left, &data);
 
-      if (res == Success && strcmp(data, lastData) != 0) {
-        lastData = (unsigned char*)malloc(sizeof(char) * strlen(data));
-        strcpy(lastData, data);
+      if (res == Success && memcmp(data, lastData, sizeof(unsigned char) * nitems) != 0) {
+        free(lastData);
+        lastData = (unsigned char*)malloc(sizeof(unsigned char) * nitems);
+        memcpy(lastData, data, sizeof(unsigned char)* nitems);
+
         // store trimmed version
-        trim(data);
-        storeData(data, config.path);
+        const char* tmp = trim(data, nitems);
+        storeData(tmp, config.path);
       }
     }
   }
