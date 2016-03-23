@@ -46,7 +46,7 @@ void storeData(const char *data, char *path)
   if (file == NULL) {
     perror("Could not open file");
   } else {
-    fprintf(file, "%s\n", data);
+    fprintf(file, "%s%c", data, '\0');
   }
   fclose(file);
 }
