@@ -16,7 +16,7 @@ Run the clipd executable. You can set the storage path and the display to use; i
 
 Afterwards you can query the file with any application you want. For example you could do something like: 
 
-`tac /tmp/clipd.data | head -10 -z | rofi -dmenu -sep '\0' | xclip -selection clipboard`
+`tail -n10 -z /tmp/clipd.data | tac --separator=\0 | rofi -dmenu -sep '\0' | xclip -selection clipboard`
 
 This will open a menu that allows you to select your last 10 clipboard entries and then put it in your ctrl+v register. 
 You can however use any application or way you deem most desirable to query this file. Note that the seperator for clips is the 0-byte.
