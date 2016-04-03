@@ -59,6 +59,8 @@ void mainLoop()
     unsigned char *data;
 
     if( ev.type == SelectionNotify ) {
+      if(ev.xselection.property == 0) continue;
+
       res = XGetWindowProperty(dis, win, ev.xselection.property, 0,
           XMaxRequestSize(dis), False,
           AnyPropertyType, &type, &format, &nitems,
