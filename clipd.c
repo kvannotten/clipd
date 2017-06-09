@@ -31,7 +31,7 @@ void setup()
 void mainLoop()
 {
   // buffer var
-  unsigned char *lastData = (unsigned char*)malloc(sizeof(char));
+  unsigned char *lastData = (unsigned char*)malloc(sizeof(unsigned char));
 
   while(1) {
     // Create a File Description Set containing x11_fd
